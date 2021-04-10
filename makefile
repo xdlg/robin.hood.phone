@@ -5,7 +5,7 @@ part = m168p
 mcu = atmega168p
 avrFrequency = 10000000
 programmer = atmelice_isp
-cflags = -Wall -Werror -Wextra -Os -DF_CPU=$(avrFrequency)
+cflags = -Wall -Wextra -Os -I. -DF_CPU=$(avrFrequency)
 
 help:
 	@echo 'help	Shows this text.'
@@ -27,7 +27,7 @@ clean:
 
 all:
 	mkdir -p $(build)
-	avr-gcc $(cflags) -mmcu=$(mcu) -o $(build)/$(main).o $(src)/$(main).c
+	avr-gcc $(cflags) -mmcu=$(mcu) -o $(build)/$(main).o $(src)/$(main).c AVR-UART-lib/usart.c
 	avr-objcopy -j .text -j .data -O ihex $(build)/$(main).o $(build)/$(main).hex
 
 flash:
