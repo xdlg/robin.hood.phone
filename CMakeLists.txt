@@ -6,6 +6,8 @@ set(MCU atmega168p)
 set(PART m168p)
 set(PROGRAMMER atmelice_isp)
 set(BAUD_RATE 9600)
+set(TX_BUFFER_SIZE 16)
+set(RX_BUFFER_SIZE 128)
 
 find_program(AVR_CC avr-gcc)
 find_program(AVR_OBJCOPY avr-objcopy)
@@ -18,6 +20,8 @@ set(CMAKE_C_COMPILER ${AVR_CC})
 add_definitions(
     -DF_CPU=${F_CPU}
     -DBAUD_RATE=${BAUD_RATE}
+    -DTX_BUFFER_SIZE=${TX_BUFFER_SIZE}
+    -DRX_BUFFER_SIZE=${RX_BUFFER_SIZE}
 )
 
 set(CMAKE_EXE_LINKER_FLAGS -mmcu=${MCU})
