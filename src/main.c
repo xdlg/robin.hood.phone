@@ -4,8 +4,6 @@
 
 #include "AVR-UART-lib/usart.h"
 
-#define BAUD_RATE 9600
-
 int main(void)
 {
     uart_init(BAUD_CALC(BAUD_RATE));
