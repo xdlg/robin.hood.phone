@@ -18,7 +18,7 @@ int main()
     init();
 
     bool success = false;
-    timer_start(2000);
+    timer_start(1000);
 
     while (!timer_has_timed_out()) {
         if (audio_board_has_started()) {
@@ -26,17 +26,25 @@ int main()
         }
     }
 
-    if (success) {
-        debug_led_set(true);
-        audio_board_play_dial_tone();
-        audio_board_is_done_playing();
-        audio_board_play_busy_tone();
-        audio_board_is_done_playing();
-        debug_led_set(false);
-        while (true) {}
+    if (!success) {
+        error_state();
     }
 
-    error_state();
+    debug_led_set(true);
+
+    if (!audio_board_play_dial_tone()) {
+        error_state();
+    }
+    while (audio_board_is_playing()) {}
+
+    if (!audio_board_play_busy_tone()) {
+        error_state();
+    }
+    while (audio_board_is_playing()) {}
+
+    debug_led_set(false);
+    /// @todo Go to sleep
+    while (true) {}
 }
 
 void init()

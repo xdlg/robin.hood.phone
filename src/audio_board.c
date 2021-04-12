@@ -1,24 +1,24 @@
 #include "audio_board.h"
 #include "AVR-UART-lib/usart.h"
+#include "timer.h"
 
+#include <avr/io.h>
 #include <string.h>
 
-#define PLAYBACK_DONE_RESPONSE  "done"
-#define NO_FILE_RESPONSE        "NoFile"
-#define PLAY_DIAL_TONE_REQUEST  "PDIAL    OGG\n"
-#define PLAY_DIAL_TONE_RESPONSE "DIAL    OGG"
-#define PLAY_BUSY_TONE_REQUEST  "PBUSY    OGG\n"
-#define PLAY_BUSY_TONE_RESPONSE "BUSY    OGG"
-
-static char buffer[RX_BUFFER_SIZE];
+static bool audio_board_play_file(const char* file_name);
 
 void audio_board_init()
 {
+    // Set PD2 as input (connected to the ACT pin of the audio board)
+    DDRD &= ~(1 << PIND2);
+
     uart_init(BAUD_CALC(BAUD_RATE));
 }
 
 bool audio_board_has_started()
 {
+    char buffer[RX_BUFFER_SIZE];
+
     if (uart_AvailableBytes() > 0) {
         uart_getln(buffer, RX_BUFFER_SIZE);
         // We use strstr instead of strcmp because there might be some carriage returns or line
@@ -33,59 +33,38 @@ bool audio_board_has_started()
     return false;
 }
 
-bool audio_board_is_done_playing()
+bool audio_board_is_playing()
 {
-    /// @todo Add timeout
-    while (true) {
-        if (uart_AvailableBytes() > 0) {
-            uart_getln(buffer, RX_BUFFER_SIZE);
-            if (strstr(buffer, PLAYBACK_DONE_RESPONSE)) {
-                return true;
-            }
-        }
-    }
-
-    return false;
+    // The pin goes low when an audio file is playing
+    return !(PIND & (1 << PIND2));
 }
 
 bool audio_board_play_dial_tone()
 {
-    uart_puts(PLAY_DIAL_TONE_REQUEST);
-
-    /// @todo Add timeout
-    while (true) {
-        if (uart_AvailableBytes() > 0) {
-            uart_getln(buffer, RX_BUFFER_SIZE);
-            if (strstr(buffer, PLAY_DIAL_TONE_RESPONSE)) {
-                return true;
-            } else if (strstr(buffer, NO_FILE_RESPONSE)) {
-                return false;
-            } else {
-                // Do nothing
-            }
-        }
-    }
-
-    return false;
+    return audio_board_play_file("DIAL");
 }
 
 bool audio_board_play_busy_tone()
 {
-    uart_puts(PLAY_BUSY_TONE_REQUEST);
+    return audio_board_play_file("BUSY");
+}
 
-    /// @todo Add timeout
-    while (true) {
-        if (uart_AvailableBytes() > 0) {
-            uart_getln(buffer, RX_BUFFER_SIZE);
-            if (strstr(buffer, PLAY_BUSY_TONE_RESPONSE)) {
-                return true;
-            } else if (strstr(buffer, NO_FILE_RESPONSE)) {
-                return false;
-            } else {
-                // Do nothing
-            }
-        }
+static bool audio_board_play_file(const char* file_name)
+{
+    const uint8_t max_file_name_length = 8;
+    if (strlen(file_name) > max_file_name_length) {
+        return false;
     }
 
-    return false;
+    // The spaces are placeholders for the file name
+    char request[] = "P        OGG\n";
+    strncpy(&request[1], file_name, strlen(file_name));
+    uart_puts(request);
+
+    const uint32_t timeout_ms = 1000;
+    timer_start(timeout_ms);
+
+    while (!timer_has_timed_out() && !audio_board_is_playing()) {}
+
+    return !timer_has_timed_out();
 }
