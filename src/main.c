@@ -10,6 +10,9 @@
 // Initializes the hardware
 void init();
 
+// Starts infinite error loop
+void error_state();
+
 int main()
 {
     init();
@@ -25,14 +28,15 @@ int main()
 
     if (success) {
         debug_led_set(true);
+        audio_board_play_dial_tone();
+        audio_board_is_done_playing();
+        audio_board_play_busy_tone();
+        audio_board_is_done_playing();
+        debug_led_set(false);
         while (true) {}
-    } else {
-        // Error state
-        while (true) {
-            debug_led_toggle();
-            _delay_ms(250);
-        }
     }
+
+    error_state();
 }
 
 void init()
@@ -40,4 +44,12 @@ void init()
     debug_led_init();
     audio_board_init();
     sei();
+}
+
+void error_state()
+{
+    while (true) {
+        debug_led_toggle();
+        _delay_ms(250);
+    }
 }
