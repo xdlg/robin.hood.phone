@@ -50,7 +50,7 @@ add_executable(${PROJECT_NAME}
     src/audio_board.c
     src/clock.c
     src/debug_led.c
-    # src/dial.c
+    src/dial.c
 )
 
 target_link_libraries(${PROJECT_NAME}
