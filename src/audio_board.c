@@ -1,6 +1,6 @@
 #include "audio_board.h"
 #include "AVR-UART-lib/usart.h"
-#include "timer.h"
+#include "clock.h"
 
 #include <avr/io.h>
 #include <string.h>
@@ -9,8 +9,8 @@ static bool audio_board_play_file(const char* file_name);
 
 void audio_board_init()
 {
-    // Set PD2 as input (connected to the ACT pin of the audio board)
-    DDRD &= ~(1 << PIND2);
+    // Set PD4 as input (connected to the ACT pin of the audio board)
+    DDRD &= ~(1 << DDD4);
 
     uart_init(BAUD_CALC(BAUD_RATE));
 }
@@ -36,7 +36,7 @@ bool audio_board_has_started()
 bool audio_board_is_playing()
 {
     // The pin goes low when an audio file is playing
-    return !(PIND & (1 << PIND2));
+    return !(PIND & (1 << PIND4));
 }
 
 bool audio_board_play_dial_tone()
@@ -62,9 +62,13 @@ static bool audio_board_play_file(const char* file_name)
     uart_puts(request);
 
     const uint32_t timeout_ms = 1000;
-    timer_start(timeout_ms);
+    uint32_t then_ms = clock_now_ms();
 
-    while (!timer_has_timed_out() && !audio_board_is_playing()) {}
+    while (!audio_board_is_playing()) {
+        if ((clock_now_ms() - then_ms) >= timeout_ms) {
+            break;
+        }
+    }
 
-    return !timer_has_timed_out();
+    return audio_board_is_playing();
 }

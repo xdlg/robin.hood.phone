@@ -5,7 +5,7 @@
 void debug_led_init()
 {
     // Set PB2 as output
-    DDRB |= (1 << PINB2);
+    DDRB |= (1 << DDB2);
 
     debug_led_set(false);
 }

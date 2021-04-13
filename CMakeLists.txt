@@ -48,8 +48,9 @@ include_directories(${PROJECT_SOURCE_DIR})
 add_executable(${PROJECT_NAME}
     src/main.c
     src/audio_board.c
+    src/clock.c
     src/debug_led.c
-    src/timer.c
+    # src/dial.c
 )
 
 target_link_libraries(${PROJECT_NAME}
