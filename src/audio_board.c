@@ -5,8 +5,6 @@
 #include <avr/io.h>
 #include <string.h>
 
-static bool audio_board_play_file(const char* file_name);
-
 void audio_board_init()
 {
     // Set PD4 as input (connected to the ACT pin of the audio board)
@@ -49,18 +47,7 @@ bool audio_board_play_busy_tone()
     return audio_board_play_file("BUSY");
 }
 
-bool audio_board_stop_playback()
-{
-    char request[] = "q\n";
-    uart_puts(request);
-
-    /// @todo Add timeout
-    while (audio_board_is_playing()) {}
-
-    return true;
-}
-
-static bool audio_board_play_file(const char* file_name)
+bool audio_board_play_file(const char* file_name)
 {
     const uint8_t max_file_name_length = 8;
     if (strlen(file_name) > max_file_name_length) {
@@ -82,4 +69,15 @@ static bool audio_board_play_file(const char* file_name)
     }
 
     return audio_board_is_playing();
+}
+
+bool audio_board_stop_playback()
+{
+    char request[] = "q\n";
+    uart_puts(request);
+
+    /// @todo Add timeout
+    while (audio_board_is_playing()) {}
+
+    return true;
 }

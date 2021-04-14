@@ -17,5 +17,9 @@ bool audio_board_play_dial_tone();
 // Plays the busy tone, returns true if playing successfully
 bool audio_board_play_busy_tone();
 
-// Stops playback
+// Plays an OGG file by name, returns true if playing successfully.
+// The file name must be null-terminated.
+bool audio_board_play_file(const char* file_name);
+
+// Stops playback, returns true on success
 bool audio_board_stop_playback();
