@@ -16,3 +16,6 @@ bool audio_board_play_dial_tone();
 
 // Plays the busy tone, returns true if playing successfully
 bool audio_board_play_busy_tone();
+
+// Stops playback
+bool audio_board_stop_playback();

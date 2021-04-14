@@ -1,19 +1,21 @@
 #include "dial.h"
-// #include "debug_led.h"
 #include "clock.h"
 
-// #include <avr/interrupt.h>
 #include <avr/io.h>
-// #include <util/atomic.h>
 
 static volatile bool is_dialling;
 static volatile uint8_t digit;
 
+// Polls the dialling pin, which indicates that a digit dialling has started.
+// Must be called at regular intervals.
+static bool dial_poll_dialling_pin();
+
+// Polls the digit pin, which indicates the digit being dialled.
+// Must be called at regular intervals.
+static bool dial_poll_digit_pin();
+
 void dial_init()
 {
-    // is_dialling = false;
-    // digit = 0xFF;
-
     // Set PD2/INT0 as input with pull-up (connected to the "dialling in progress" pin)
     DDRD &= ~(1 << DDD2);
     PORTD |= (1 << PORTD2);
@@ -21,16 +23,17 @@ void dial_init()
     // Set PD3/INT1 as input with pull-up (connected to the "number" pin)
     DDRD &= ~(1 << DDD3);
     PORTD |= (1 << PORTD3);
+}
 
-    // Enable rising edge interrupt on dialling in progress
-    // EICRA |= (1 << ISC00);
-    // EICRA |= (1 << ISC01);
-    // EIMSK |= (1 << INT0);
+void dial_monitor_activity()
+{
+    is_dialling = !dial_poll_dialling_pin();
+    dial_poll_digit_pin();
+}
 
-    // Enable rising edge interrupt on digit signal
-    // EICRA |= (1 << ISC10);
-    // EICRA |= (1 << ISC11);
-    // EIMSK |= (1 << INT1);
+bool dial_is_dialling()
+{
+    return is_dialling;
 }
 
 uint8_t dial_last_digit()
@@ -69,16 +72,18 @@ uint8_t dial_last_digit()
     }
 }
 
-bool dial_poll_dialling_pin()
+static bool dial_poll_dialling_pin()
 {
-    static const uint8_t counter_max = 5;
     static uint8_t counter = 0;
+    // Number of consecutive signal samples required to consider the signal stable
+    static const uint8_t n_stable_samples = 5;
+    // The pin is normally high and goes low when the dial is turned counter-clockwise
     static bool debounced_pin = true;
     bool hardware_pin = (PIND & (1 << PIND2));
 
     if (debounced_pin == hardware_pin) {
         counter = 0;
-    } else if (++counter == counter_max) {
+    } else if (++counter == n_stable_samples) {
         debounced_pin = hardware_pin;
         counter = 0;
     } else {
@@ -88,16 +93,18 @@ bool dial_poll_dialling_pin()
     return debounced_pin;
 }
 
-bool dial_poll_digit_pin()
+static bool dial_poll_digit_pin()
 {
-    static const uint8_t counter_max = 5;
     static uint8_t counter = 0;
+    // Number of consecutive signal samples required to consider the signal stable
+    static const uint8_t n_stable_samples = 5;
+    // The pin is normally low and goes high N times to encode the digit N
     static bool debounced_pin = false;
     bool hardware_pin = (PIND & (1 << PIND3));
 
     if (debounced_pin == hardware_pin) {
         counter = 0;
-    } else if (++counter == counter_max) {
+    } else if (++counter == n_stable_samples) {
         debounced_pin = hardware_pin;
         counter = 0;
     } else {
@@ -106,42 +113,3 @@ bool dial_poll_digit_pin()
 
     return debounced_pin;
 }
-
-// uint8_t dial_wait_for_digit()
-// {
-//     digit = 0xFF;
-//
-//     // Enable rising edge interrupt on digit signal
-//     EICRA |= (1 << ISC10);
-//     EICRA |= (1 << ISC11);
-//     EIMSK |= (1 << INT1);
-//
-//     static const uint32_t timeout_ms = 2000;
-//     timer_start(timeout_ms);
-//     while (!timer_has_timed_out()) {}
-//
-//     // Disable interrupt
-//     EIMSK |= (1 << INT1);
-//
-//     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-//     {
-//         is_dialling = false;
-//     }
-//
-//     return (digit == 10) ? 0 : digit;
-// }
-
-// ISR(INT0_vect)
-// {
-//     is_dialling = true;
-// }
-
-// ISR(INT1_vect)
-// {
-    // digit++;
-    // if (digit == 0xFF) {
-    //     digit = 1;
-    // } else {
-    //     digit++;
-    // }
-// }

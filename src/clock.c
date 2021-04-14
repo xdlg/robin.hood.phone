@@ -1,7 +1,7 @@
 #include "clock.h"
 
-#include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/io.h>
 #include <util/atomic.h>
 
 static volatile uint32_t now_ms;
