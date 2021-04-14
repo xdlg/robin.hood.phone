@@ -3,20 +3,17 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define INVALID_TIME_SINCE_ACTIVITY 0xFFFF
-#define INVALID_DIGIT 0xFF
+typedef enum {
+    DIAL_STATE_WAITING,
+    DIAL_STATE_DIALLING,
+    DIAL_STATE_FINISHED
+} dial_state_t;
 
 // Initializes the dial
 void dial_init();
 
-// Monitors the dial's activity (must be called at regular intervals)
-void dial_monitor_activity();
+// Returns the dial's state (must be called at regular intervals)
+dial_state_t dial_state();
 
-// Returns the elapsed time in milliseconds since a dialling activity has been detected.
-// If no activity has ever been detected, the returned value is meaningless.
-uint32_t dial_time_since_activity_ms();
-
-// Returns true if dialling in progress
-bool dial_is_dialling();
-
-uint8_t dial_last_digit();
+// Returns the dialled number as null-terminated string (only valid if state is DIAL_STATE_FINISHED)
+char* dial_number();

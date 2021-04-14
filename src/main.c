@@ -39,22 +39,26 @@ int main()
         error_state();
     }
 
-    then_ms = clock_now_ms();
-    const uint32_t dial_activity_timeout_ms = 3000;
+    dial_state_t current_dial_state = DIAL_STATE_WAITING;
 
-    while (audio_board_is_playing()
-            || ((dial_time_since_activity_ms() != INVALID_TIME_SINCE_ACTIVITY)
-                && (dial_time_since_activity_ms() < dial_activity_timeout_ms))) {
+    while (audio_board_is_playing() || (current_dial_state == DIAL_STATE_DIALLING)) {
         const uint32_t sampling_time_ms = 5;
         uint32_t now_ms = clock_now_ms();
 
         if ((now_ms - then_ms) >= sampling_time_ms) {
             then_ms = now_ms;
-            dial_monitor_activity();
-            if (audio_board_is_playing() && dial_is_dialling()) {
+            current_dial_state = dial_state();
+            if (audio_board_is_playing() && (current_dial_state == DIAL_STATE_DIALLING)) {
                 audio_board_stop_playback();
             }
         }
+    }
+
+    if (current_dial_state == DIAL_STATE_FINISHED) {
+        char* dialled_number = dial_number();
+        uart_puts("\r\n");
+        uart_puts(dialled_number);
+        uart_puts("\r\n");
     }
 
     if (!audio_board_play_busy_tone()) {
