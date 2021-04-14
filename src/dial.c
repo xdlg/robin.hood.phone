@@ -3,8 +3,9 @@
 
 #include <avr/io.h>
 
-static volatile bool is_dialling;
-static volatile uint8_t digit;
+static uint32_t time_since_activity_ms;
+static bool is_dialling;
+static uint8_t digit;
 
 // Polls the dialling pin, which indicates that a digit dialling has started.
 // Must be called at regular intervals.
@@ -16,6 +17,10 @@ static bool dial_poll_digit_pin();
 
 void dial_init()
 {
+    time_since_activity_ms = INVALID_TIME_SINCE_ACTIVITY;
+    is_dialling = false;
+    digit = INVALID_DIGIT;
+
     // Set PD2/INT0 as input with pull-up (connected to the "dialling in progress" pin)
     DDRD &= ~(1 << DDD2);
     PORTD |= (1 << PORTD2);
@@ -27,8 +32,27 @@ void dial_init()
 
 void dial_monitor_activity()
 {
-    is_dialling = !dial_poll_dialling_pin();
-    dial_poll_digit_pin();
+    // A falling edge on the dialling pin means that dialling has started
+    bool dialling_pin = dial_poll_dialling_pin();
+    if (!is_dialling && !dialling_pin) {
+        time_since_activity_ms = clock_now_ms();
+        is_dialling = !dialling_pin;
+        digit = 0;
+    }
+
+    // A rising edge on the digit pin encodes a digit increment
+    static bool old_digit_pin = false;
+    bool new_digit_pin = dial_poll_digit_pin();
+    if (!old_digit_pin && new_digit_pin) {
+        time_since_activity_ms = clock_now_ms();
+        digit++;
+    }
+}
+
+uint32_t dial_time_since_activity_ms()
+{
+    return (time_since_activity_ms == INVALID_TIME_SINCE_ACTIVITY) ?
+        INVALID_TIME_SINCE_ACTIVITY : (clock_now_ms() - time_since_activity_ms);
 }
 
 bool dial_is_dialling()
