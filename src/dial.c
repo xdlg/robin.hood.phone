@@ -7,8 +7,13 @@
 #define INVALID_TIME 0xFFFF
 #define INVALID_DIGIT 0xFF
 
-// The last char is a null terminator
+// Dialled number (the last char is a null terminator)
 static char number[MAX_DIGITS_IN_NUMBER + 1];
+// Index of the next digit to store in the number string
+static uint8_t digit_index;
+
+// Stores a digit in the number string
+static void dial_store_digit(uint8_t digit);
 
 // Polls the dialling pin, which indicates that a digit dialling has started.
 // Must be called at regular intervals.
@@ -23,11 +28,12 @@ static void dial_reset_number();
 
 // Converts a digit to ASCII.
 // Returns 0 if not representable on a single digit.
-static char dial_digit_to_ascii(uint8_t d);
+static char dial_digit_to_ascii(uint8_t digit);
 
 void dial_init()
 {
     dial_reset_number();
+    digit_index = 0;
 
     // Set PD2/INT0 as input with pull-up (connected to the "dialling in progress" pin)
     DDRD &= ~(1 << DDD2);
@@ -40,7 +46,6 @@ void dial_init()
 
 dial_state_t dial_state()
 {
-    static uint8_t digit_index = 0;
     if (digit_index >= MAX_DIGITS_IN_NUMBER) {
         // We're already at capacity, get out of here
         return DIAL_STATE_FINISHED;
@@ -55,11 +60,7 @@ dial_state_t dial_state()
         && ((clock_now_ms() - last_activity_time_ms) >= activity_timeout_ms)) {
         // Store the last valid digit
         if (digit != INVALID_DIGIT) {
-            if (digit == 10) {
-                // 0 is encoded with 10 rising edges
-                digit = 0;
-            }
-            number[digit_index++] = dial_digit_to_ascii(digit);
+            dial_store_digit(digit);
         }
 
         return DIAL_STATE_FINISHED;
@@ -78,13 +79,8 @@ dial_state_t dial_state()
         if (!dialling_pin) {
             // Store the last valid digit
             if (digit != INVALID_DIGIT) {
-                if (digit == 10) {
-                    // 0 is encoded with 10 rising edges
-                    digit = 0;
-                }
-                number[digit_index++] = dial_digit_to_ascii(digit);
+                dial_store_digit(digit);
             }
-
             // Start counting edges on the digit pin
             digit = 0;
         }
@@ -92,6 +88,7 @@ dial_state_t dial_state()
 
     static bool digit_pin = false;
     bool new_digit_pin = dial_poll_digit_pin();
+
     if (digit_pin != new_digit_pin) {
         last_activity_time_ms = clock_now_ms();
         state = DIAL_STATE_DIALLING;
@@ -109,6 +106,15 @@ dial_state_t dial_state()
 char* dial_number()
 {
     return number;
+}
+
+static void dial_store_digit(uint8_t digit)
+{
+    if (digit == 10) {
+        // 0 is encoded with 10 rising edges
+        digit = 0;
+    }
+    number[digit_index++] = dial_digit_to_ascii(digit);
 }
 
 static bool dial_poll_dialling_pin()
@@ -160,7 +166,7 @@ static void dial_reset_number()
     }
 }
 
-static char dial_digit_to_ascii(uint8_t d)
+static char dial_digit_to_ascii(uint8_t digit)
 {
-    return (d < 10) ? ('0' + d) : '\0';
+    return (digit < 10) ? ('0' + digit) : '\0';
 }
