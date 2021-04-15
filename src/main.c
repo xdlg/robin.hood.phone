@@ -47,7 +47,7 @@ bool init()
     uint32_t then_ms = clock_now_ms();
 
     while ((clock_now_ms() - then_ms) < timeout_ms) {
-        if (audio_board_has_started()) { success = true; }
+        if (!success && audio_board_has_started()) success = true;
     }
 
     return success;
@@ -76,6 +76,11 @@ bool wait_for_dial()
     if (current_dial_state == DIAL_STATE_FINISHED) {
         if (audio_board_play_file(dial_number())) {
             while (audio_board_is_playing()) {}
+
+            // Short delay for better user experience
+            const uint32_t hangup_delay_ms = 2000;
+            then_ms = clock_now_ms();
+            while ((clock_now_ms() - then_ms) < hangup_delay_ms) {}
         };
     }
 
