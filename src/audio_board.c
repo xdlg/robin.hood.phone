@@ -7,8 +7,8 @@
 
 void audio_board_init()
 {
-    // Set PD4 as input (connected to the ACT pin of the audio board)
-    DDRD &= ~(1 << DDD4);
+    // Set PB5 as input (connected to the ACT pin of the audio board)
+    DDRB &= ~(1 << DDB5);
 
     uart_init(BAUD_CALC(BAUD_RATE));
 }
@@ -34,7 +34,7 @@ bool audio_board_has_started()
 bool audio_board_is_playing()
 {
     // The pin goes low when an audio file is playing
-    return !(PIND & (1 << PIND4));
+    return !(PINB & (1 << PINB5));
 }
 
 bool audio_board_play_dial_tone()
