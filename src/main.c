@@ -19,10 +19,10 @@ bool wait_for_dial();
 // Returns true if the tone has been found and entirely played back, false otherwise.
 bool busy();
 
-// Starts infinite error loop
+// Starts infinite error loop.
 void error();
 
-// Starts infinite idle loop
+// Starts infinite idle loop.
 void idle();
 
 int main()
@@ -112,6 +112,5 @@ void error()
 void idle()
 {
     debug_led_set(false);
-    /// @todo Go to sleep
     while (true) {}
 }

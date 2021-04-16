@@ -12,7 +12,7 @@ static char number[MAX_DIGITS_IN_NUMBER + 1];
 // Index of the next digit to store in the number string
 static uint8_t digit_index;
 
-// Stores a digit in the number string
+// Stores a digit in the number string.
 static void dial_store_digit(uint8_t digit);
 
 // Polls the dialling pin, which indicates that a digit dialling has started.
@@ -23,7 +23,7 @@ static bool dial_poll_dialling_pin();
 // Must be called at regular intervals.
 static bool dial_poll_digit_pin();
 
-// Resets the dialled number
+// Resets the dialled number.
 static void dial_reset_number();
 
 // Converts a digit to ASCII.

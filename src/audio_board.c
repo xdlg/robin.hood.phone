@@ -59,16 +59,16 @@ bool audio_board_play_file(const char* file_name)
     strncpy(&request[1], file_name, strlen(file_name));
     uart_puts(request);
 
-    const uint32_t timeout_ms = 1000;
+    const uint32_t timeout_ms = 500;
     uint32_t then_ms = clock_now_ms();
 
     while (!audio_board_is_playing()) {
         if ((clock_now_ms() - then_ms) >= timeout_ms) {
-            break;
+            return false;
         }
     }
 
-    return audio_board_is_playing();
+    return true;
 }
 
 bool audio_board_stop_playback()
@@ -76,8 +76,14 @@ bool audio_board_stop_playback()
     char request[] = "q\n";
     uart_puts(request);
 
-    /// @todo Add timeout
-    while (audio_board_is_playing()) {}
+    const uint32_t timeout_ms = 500;
+    uint32_t then_ms = clock_now_ms();
+
+    while (audio_board_is_playing()) {
+        if ((clock_now_ms() - then_ms) >= timeout_ms) {
+            return false;
+        }
+    }
 
     return true;
 }
