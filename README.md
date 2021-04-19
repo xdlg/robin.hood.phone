@@ -3,6 +3,8 @@
 The robinhood phone is an old rotary phone that plays audio files associated with a predefined phone
 number. See [Hackaday page](https://hackaday.io/project/178458-robinhoodphone) for details.
 
+[![](http://img.youtube.com/vi/xx1U7tg0Cz8/0.jpg)](http://www.youtube.com/watch?v=xx1U7tg0Cz8 "")
+
 ## Hardware
 
 - [ATMega168PA](https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-9223-Automotive-Microcontrollers-ATmega48PA-ATmega88PA-ATmega168PA_Datasheet.pdf) on a [Crumb168 V2.3](https://www.terraelectronica.ru/pdf/show?pdf_file=%252Fz%252FDatasheet%252FA%252FAVR-CRUMB168-USB.pdf) by Chip45
