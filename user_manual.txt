@@ -126,7 +126,7 @@ Nothing happens when you plug the USB cable into your computer: Unplug it, make 
 is on the hook, then plug it in again. If you still have issues and you're using Microsoft Windows,
 then try to stop using Microsoft Windows ¯\_(ツ)_/¯
 
-The hook doesn't slide up or down: Open the case as explained in step X, and put some WD40 on the
+The hook doesn't slide up or down: Open the case as explained above, and put some WD40 on the
 hook's metal shaft (the little metal rod that is attached to the hook in the top part of the case).
 
 There's still a problem and nothing helps: please contact Xavier (ask around for my contact info
