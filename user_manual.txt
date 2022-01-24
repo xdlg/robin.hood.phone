@@ -1,0 +1,130 @@
+robinhood.phone
+===============
+
+Hackaday: https://hackaday.io/project/178458-robinhoodphone
+GitHub: https://github.com/xdlg/robinhood.phone
+
+
+What's that?
+============
+
+It's an old rotary phone with most of the parts inside replaced by more modern electronics, which
+can play audio files associated with a predefined phone number. Additional audio files can be
+stored via the USB cable at the back. The phone runs on a LiPo battery, which is also charged with
+the USB cable.
+
+
+How do I use it?
+================
+
+The phone software is designed to mimic the behavior of a real phone, so it should be fairly
+intuitive to use: pick it up, dial a number, listen, hang up. If you want more details on what to
+expect, here it is:
+
+1. Pick up the handset. This powers up the phone.
+2. One second after picking up, you hear a dial tone.
+2. Once the dial tone starts playing, you have thirty seconds to dial a number. If you don't dial
+   anything, the phone goes straight to step 7.
+3. Once you start dialing, the dial tone stops.
+4. Every time you dial a new digit and the wheel stops turning, you have three seconds to dial the
+   next digit. If no new digit is input within three seconds, or if eight digits have already been
+   input, the phone tries to compose that number.
+   Ex: Dial 0, then 3, then 0, and wait three seconds -> the phone tries to compose the number 030.
+5. If the composed number corresponds to the name of an audio file stored on the phone, the file is
+   played back. If this file doesn't exist, the phone goes straight to step 7.
+6. Once the audio file is finished playing, there's two seconds of silence.
+7. The busy tone plays for 30 seconds, after which it goes silent.
+
+Additional notes:
+- At any time, the sequence can be restarted by hanging up and picking up the handset again.
+- Just because the phone is silent, doesn't mean that the electronics inside are off.
+  The phone is powered all the time that the handset is off the hook, so if you don't want to drain
+  the battery unnecessarily, be sure to put the handset back on the hook properly after use.
+- Most of the behavior can be changed, for example waiting five seconds instead of three between
+  digits. If you need a change or a new feature, please contact me.
+
+
+How do I add new numbers/audio files?
+=====================================
+
+1. Prepare the audio files:
+   a. The only file format that the current software can play is OGG.
+   b. The memory on the phone is limited to 16 MB total, so keep the audio files small.
+      The following characteristics seem to give a good compromise between file size and quality:
+      mono, sampling frequency 22 kHz, 16-bit encoding. A 2:30 OGG file like this is about 1 MB.
+      If you want to make it even smaller, try reducing the sampling to 8 kHz.
+   c. Name the file with its phone number. For example, if you want a file to be available under the
+      number 030, name your file "030.ogg" (without the quotation marks). Phone numbers must have at
+      least one digit and at most eight digits. The file extension can be in lowercase or in
+      uppercase (both "030.ogg" and "030.OGG" are acceptable).
+2. Connect the phone's USB cable to your computer.
+3. The phone should appear as a standard flash drive would. There should already be at least this
+   user manual on the phone as well as two audio file, "dial.ogg" and "busy.ogg". Copy your audio
+   files to the phone.
+4. On your computer, click on "Remove USB device safely" (depending on your operating system).
+5. Unplug the USB cable.
+6. Try the new numbers by calling them.
+
+If the phone is plugged into a computer, it can't be used to call a number. Conversely, if the phone
+is unhooked and then plugged into a computer, the computer might not recognize it. It's only
+guaranteed to work when doing one or the other: either you use it as a phone, or you use it as a USB
+drive. But not at the same time.
+
+
+How to charge the battery
+=========================
+
+The battery is charged by plugging the USB cable into any USB port (computer or charger).
+I recommended charging the phone for a short time (half an hour to an hour) every day or every other
+day. This will prolong the battery life, compared for instance to do a full long charge every week.
+
+Here are some additional infos if you need:
+
+- It's a 2000 mAh LiPo battery, which should hold for several days if people take care of hanging up
+  properly after use.
+- Full charge from 0% to 100% takes about 4-5 hours.
+- There's a protection against overcharging and deep discharging, so you won't break anything by
+  leaving the phone plugged in after it's already fully charged, but I still don't recommend it.
+  It's good quality electronics and I took care of assembling everything safely, but lithium
+  batteries are still know to catch fire and/or explode from time to time, so please don't leave
+  the phone plugged and unattended for long periods of time.
+- If you turn the phone upside down while it's plugged in, and look through the holes in the bottom
+  plate, you will see a small green light and a small red light. The red light goes off when the
+  battery is fully charged, so if you see only a green light, it means that charging is done.
+  However, all this isn't too important -- just make sure to charge the phone a little bit every day
+  or couple of days, and everything will be fine.
+
+
+How do I care for the phone?
+============================
+
+Don't drop it, don't hit it, don't let it come in contact with liquids (including rain), don't
+submit it to extreme temperatures (e.g. leaving it in the sun in summer, or outside in winter),
+don't store it for long period of times without unplugging the battery, and don't pull too hard on
+the cables.
+
+Just treat it with love <3
+
+
+Troubleshooting
+===============
+
+The phone doesn't seem to work at all: First make sure that the battery is charged.
+
+The dial tone or the busy tone don't play according to the sequence described at the beginning of
+this file: Plug the phone into a computer and check if both files "dial.ogg" and "busy.ogg" are
+present. If they aren't, restore them (https://github.com/xdlg/robinhood.phone/tree/main/sounds).
+
+Everything inside the phone is glued, screwed, or taped down. If you pick it up (the whole device,
+not just the handset) and shake it a little bit, it shouldn't sound like something is moving
+around. If that is the case, open the case by unscrewing the two screws on the bottom. Be careful
+when lifting the top part, because the dial is cabled to the electronics inside. Try to find what
+has come loose and if it's obvious, fix it. You can check out the pictures on the Hackaday page
+(https://hackaday.io/project/178458-robinhoodphone) to see how the inside should look like.
+
+Nothing happens when you plug the USB cable into your computer: Unplug it, make sure that the phone
+is on the hook, then plug it in again. If you still have issues and you're using Microsoft Windows,
+then try to stop using Microsoft Windows ¯\_(ツ)_/¯
+
+The hook doesn't slide up or down: Open the case as explained above, and put some WD40 on the
+hook's metal shaft (the little metal rod that is attached to the hook in the top part of the case).
